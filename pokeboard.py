@@ -311,7 +311,7 @@ with tab2:
                     else:
                         c1 = c2 = "black"
 
-                row_cols = st.columns([1, 1, 1, 1])
+                row_cols = st.columns([1, 1, 1])
                 row_cols[0].markdown(f"`{stat}`")
                 row_cols[1].markdown(
                     f"<span style='color:{c1}; font-weight:600'>{stat1}</span>",
