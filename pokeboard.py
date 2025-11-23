@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from utils.api import fetch_pokemon_data, fetch_front_sprite
+from utils.api import fetch_back_sprite, fetch_pokemon_data, fetch_front_sprite
 from utils.type_utils import type_effectiveness
 
 # TODO refactor into separate files
@@ -78,7 +78,31 @@ def radar_chart(df, selected_pokemon_name):
     ]
     values = [pokemon[cat].iloc[0] for cat in categories]
 
-    fig = px.line_polar(r=values, theta=categories, line_close=True)
+    fig = px.line_polar(
+        r=values,
+        theta=categories,
+        line_close=True,
+        color_discrete_sequence=["red"],
+    )
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=False,  # hide radial axis
+                showline=False,
+                # showticklabels=False,
+                showgrid=False,
+            ),
+            angularaxis=dict(
+                # visible=False,  # hide angular axis
+                showline=False,
+                # showticklabels=False,
+                showgrid=False,
+            ),
+            bgcolor="white",  # background
+        ),
+        showlegend=False,
+    )
+    fig.update_traces(fill="toself", fillcolor="rgba(255,0,0,0.3)")
     return fig
 
 
@@ -136,21 +160,27 @@ with tab1:
             st.plotly_chart(chart)
         with st.container(key="sprites-and-info"):
             with st.container(key="sprites", horizontal=True):
-                if pokemon_api_data and "sprites" in pokemon_api_data:
-                    front_sprite_url = pokemon_api_data["sprites"][
-                        "front_default"
-                    ]
-                    back_sprite_url = pokemon_api_data["sprites"][
-                        "back_default"
-                    ]
-                    st.image(front_sprite_url, width=150)
-                    st.image(back_sprite_url, width=150)
-                else:
-                    front_sprite_url = fallback_img
-                    back_sprite_url = fallback_img
-                    st.image(front_sprite_url, width=150)
-                    st.image(back_sprite_url, width=150)
-            with st.container(key="info"):
+                front_sprite = fetch_front_sprite(
+                    st.session_state.selected_pokemon[
+                        language_data["English"]["column"]
+                    ].iloc[0]
+                )
+                back_sprite = fetch_back_sprite(
+                    st.session_state.selected_pokemon[
+                        language_data["English"]["column"]
+                    ].iloc[0]
+                )
+                st.image(
+                    front_sprite,
+                    width=150,
+                    caption="Front Sprite",
+                )
+                st.image(
+                    back_sprite,
+                    width=150,
+                    caption="Back Sprite",
+                )
+            with st.container(key="info", horizontal_alignment="center"):
                 st.markdown(f"### {selected_pokemon_name} Info")
                 info_cols = st.columns([1, 2])
                 info_cols[0].markdown("**Height (m):**")
