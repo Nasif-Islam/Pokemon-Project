@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from utils.api import fetch_pokemon_data
+from utils.api import fetch_pokemon_data, fetch_front_sprite
 from utils.type_utils import type_effectiveness
 
 # TODO refactor into separate files
@@ -87,7 +87,7 @@ if st.session_state.get("first_run", True):
     st.session_state["first_run"] = False
     st.session_state["selected_pokemon_idx"] = 32
 
-# pokemon selector
+# stateful pokemon selector
 stored_idx = st.session_state.get("selected_pokemon_idx", poke_data.index[0])
 try:
     selectbox_pos = int(poke_data.index.get_loc(stored_idx))  # type: ignore
@@ -122,7 +122,7 @@ selected_pokemon_name = st.session_state.selected_pokemon[
 chart = radar_chart(poke_data, selected_pokemon_name)
 pokemon_api_data = fetch_pokemon_data(selected_pokemon_name)
 
-tab1, tab2 = st.tabs(["Overview", "Match-up"])
+tab1, tab2, tab3 = st.tabs(["Overview", "Match-up", "Statistics"])
 
 with tab1:
     st.selectbox(
@@ -226,7 +226,7 @@ with tab2:
         )
     with st.container(key="stat-comparison"):
         if not first_pokemon.empty and not second_pokemon.empty:
-
+            # TODO add images
             st.markdown(
                 f"### Match-up: {first_pokemon_name} attacking {second_pokemon_name}"
             )
@@ -281,7 +281,7 @@ with tab2:
                     else:
                         c1 = c2 = "black"
 
-                row_cols = st.columns([1, 1, 1])
+                row_cols = st.columns([1, 1, 1, 1])
                 row_cols[0].markdown(f"`{stat}`")
                 row_cols[1].markdown(
                     f"<span style='color:{c1}; font-weight:600'>{stat1}</span>",
@@ -291,3 +291,6 @@ with tab2:
                     f"<span style='color:{c2}; font-weight:600'>{stat2}</span>",
                     unsafe_allow_html=True,
                 )
+
+with tab3:
+    st.markdown("### Statistics")
