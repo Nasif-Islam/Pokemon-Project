@@ -53,6 +53,38 @@ stats_list = [
     "weight_kg",
 ]
 
+STAT_KEYS = stats_list[:-4]
+NEUTRAL_MODIFIERS = {key: 1.0 for key in STAT_KEYS}
+DEFAULT_NATURE = "Neutral"
+NATURE_MODIFIERS = {
+    "Neutral": {},
+    "Hardy": {},
+    "Docile": {},
+    "Serious": {},
+    "Bashful": {},
+    "Quirky": {},
+    "Lonely": {"attack": 1.1, "defense": 0.9},
+    "Brave": {"attack": 1.1, "speed": 0.9},
+    "Adamant": {"attack": 1.1, "sp_attack": 0.9},
+    "Naughty": {"attack": 1.1, "sp_defense": 0.9},
+    "Bold": {"defense": 1.1, "attack": 0.9},
+    "Relaxed": {"defense": 1.1, "speed": 0.9},
+    "Impish": {"defense": 1.1, "sp_attack": 0.9},
+    "Lax": {"defense": 1.1, "sp_defense": 0.9},
+    "Timid": {"speed": 1.1, "attack": 0.9},
+    "Hasty": {"speed": 1.1, "defense": 0.9},
+    "Jolly": {"speed": 1.1, "sp_attack": 0.9},
+    "Naive": {"speed": 1.1, "sp_defense": 0.9},
+    "Modest": {"sp_attack": 1.1, "attack": 0.9},
+    "Mild": {"sp_attack": 1.1, "defense": 0.9},
+    "Quiet": {"sp_attack": 1.1, "speed": 0.9},
+    "Rash": {"sp_attack": 1.1, "sp_defense": 0.9},
+    "Calm": {"sp_defense": 1.1, "attack": 0.9},
+    "Gentle": {"sp_defense": 1.1, "defense": 0.9},
+    "Sassy": {"sp_defense": 1.1, "speed": 0.9},
+    "Careful": {"sp_defense": 1.1, "sp_attack": 0.9},
+}
+NATURE_OPTIONS = list(NATURE_MODIFIERS.keys())
 
 # sidebar
 st.sidebar.title("Settings")
@@ -62,9 +94,19 @@ language = st.sidebar.selectbox(
     "Select language", ["English", "Deutsch", "日本語"], index=0
 )
 
+# Nature filter
+apply_nature_filter = st.sidebar.checkbox("Apply nature filter", value=False)
+if apply_nature_filter:
+    selected_nature = st.sidebar.selectbox(
+        "Nature",
+        NATURE_OPTIONS,
+        index=NATURE_OPTIONS.index(DEFAULT_NATURE),
+    )
+else:
+    selected_nature = DEFAULT_NATURE
 
 # plotly radar
-def radar_chart(df, selected_pokemon_name):
+def radar_chart(df, selected_pokemon_name, modifiers):
     pokemon = df[
         df[language_data[language]["column"]] == selected_pokemon_name
     ]
@@ -76,7 +118,11 @@ def radar_chart(df, selected_pokemon_name):
         f"sp_defense{'' if not normalise else '_norm'}",
         f"speed{'' if not normalise else '_norm'}",
     ]
-    values = [pokemon[cat].iloc[0] for cat in categories]
+    values = []
+    for cat in categories:
+        base_value = pokemon[cat].iloc[0]
+        base_stat = cat.replace("_norm", "")
+        values.append(base_value * modifiers.get(base_stat, 1.0))
 
     fig = px.line_polar(
         r=values,
@@ -143,7 +189,11 @@ selected_pokemon_name = st.session_state.selected_pokemon[
     language_data[language]["column"]
 ].iloc[0]
 
-chart = radar_chart(poke_data, selected_pokemon_name)
+modifiers = NEUTRAL_MODIFIERS.copy()
+if apply_nature_filter:
+    modifiers.update(NATURE_MODIFIERS.get(selected_nature, {}))
+
+chart = radar_chart(poke_data, selected_pokemon_name, modifiers)
 pokemon_api_data = fetch_pokemon_data(selected_pokemon_name)
 
 overview, match_up, statistics = st.tabs(
@@ -201,6 +251,10 @@ with overview:
                 info_cols[1].markdown(f"{type1}")
                 info_cols[0].markdown("**Type 2:**")
                 info_cols[1].markdown(f"{type2}")
+                info_cols[0].markdown("**Nature filter:**")
+                info_cols[1].markdown(
+                    selected_nature if apply_nature_filter else "Off"
+                )
 
 
 with match_up:
