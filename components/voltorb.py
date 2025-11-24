@@ -36,6 +36,7 @@ if "board" not in st.session_state:
             (0.2 if is_electric else 0) +
             (0.2 if row.get('legendary', False) else 0) -
             (row['speed'] / 300)
+            # chances of getting a voltorb depending on if its a legendary, electric etc
         )
 
         is_voltorb = random.random() < voltorb_prob
