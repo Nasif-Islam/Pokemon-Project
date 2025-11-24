@@ -148,8 +148,8 @@ selected_pokemon_name = st.session_state.selected_pokemon[
 chart = radar_chart(poke_data, selected_pokemon_name)
 pokemon_api_data = fetch_pokemon_data(selected_pokemon_name)
 
-overview, match_up, statistics = st.tabs(
-    ["Overview", "Match-up", "Statistics", "IV_calculator"]
+overview, match_up, statistics, IV_calculator = st.tabs(
+    ["Overview", "Match-up", "Statistics", "IV Calculator"]
 )
 
 with overview:
