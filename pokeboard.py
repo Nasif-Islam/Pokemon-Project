@@ -146,9 +146,11 @@ selected_pokemon_name = st.session_state.selected_pokemon[
 chart = radar_chart(poke_data, selected_pokemon_name)
 pokemon_api_data = fetch_pokemon_data(selected_pokemon_name)
 
-tab1, tab2, tab3 = st.tabs(["Overview", "Match-up", "Statistics"])
+overview, match_up, statistics = st.tabs(
+    ["Overview", "Match-up", "Statistics"]
+)
 
-with tab1:
+with overview:
     st.selectbox(
         "Select a Pokémon",
         language_data[language]["name_list"],
@@ -201,7 +203,7 @@ with tab1:
                 info_cols[1].markdown(f"{type2}")
 
 
-with tab2:
+with match_up:
     with st.container(key="match-up", horizontal=True):
         with st.container(key="dropdowns", horizontal=True):
             st.selectbox(
@@ -320,5 +322,5 @@ with tab2:
                     unsafe_allow_html=True,
                 )
 
-with tab3:
+with statistics:
     st.markdown("### Statistics")
