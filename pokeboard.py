@@ -186,23 +186,36 @@ with overview:
                 )
             with st.container(key="info", horizontal_alignment="center"):
                 st.markdown(f"### {selected_pokemon_name} Info")
-                info_cols = st.columns([1, 2])
-                info_cols[0].markdown("**Height (m):**")
-                info_cols[1].markdown(
-                    f"{st.session_state.selected_pokemon['height_m'].iloc[0]}"
+                selected = st.session_state.selected_pokemon.iloc[0]
+                type1 = (
+                    selected["type_1"]
+                    if not pd.isna(selected["type_1"])
+                    else "none"
                 )
-                info_cols[0].markdown("**Weight (kg):**")
-                info_cols[1].markdown(
-                    f"{st.session_state.selected_pokemon['weight_kg'].iloc[0]}"
+                type2 = (
+                    selected["type_2"]
+                    if not pd.isna(selected["type_2"])
+                    else "none"
                 )
-                type1 = st.session_state.selected_pokemon["type_1"].iloc[0]
-                type1 = "none" if pd.isna(type1) else type1
-                type2 = st.session_state.selected_pokemon["type_2"].iloc[0]
-                type2 = "none" if pd.isna(type2) else type2
-                info_cols[0].markdown("**Type 1:**")
-                info_cols[1].markdown(f"{type1}")
-                info_cols[0].markdown("**Type 2:**")
-                info_cols[1].markdown(f"{type2}")
+
+                info_df = pd.DataFrame(
+                    {
+                        "Attribute": [
+                            "Height (m)",
+                            "Weight (kg)",
+                            "Type 1",
+                            "Type 2",
+                        ],
+                        "Value": [
+                            selected["height_m"],
+                            selected["weight_kg"],
+                            type1,
+                            type2,
+                        ],
+                    }
+                )
+
+                st.table(info_df)
 
 
 with match_up:
