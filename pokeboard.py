@@ -267,8 +267,6 @@ with tab2:
             header_cols[2].markdown(f"**{second_pokemon_name}**")
 
             for stat in stats:
-                # TODO add type comparison handling
-
                 stat1 = first_pokemon.iloc[0][stat]
                 stat2 = second_pokemon.iloc[0][stat]
 

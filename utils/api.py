@@ -29,7 +29,6 @@ def fetch_back_sprite(pokemon_name):
         return fallback_img
 
 
-# prevent side effects on import; only run test code when executed directly
 if __name__ == "__main__":
     pokemon_data = fetch_pokemon_data("Pikachu")
     if pokemon_data:
